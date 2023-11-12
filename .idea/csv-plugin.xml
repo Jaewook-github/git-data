@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CsvFileAttributes">
+    <option name="attributeMap">
+      <map>
+        <entry key="G:\anaconda3\envs\system_trading_py39_32\Lib\site-packages\intake\cli\sample\states_1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="G:\anaconda3\envs\system_trading_py39_32\Lib\site-packages\intake\cli\sample\states_2.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="G:\anaconda3\envs\system_trading_py39_32\Lib\site-packages\statsmodels\stats\tests\results\binary_constrict.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
