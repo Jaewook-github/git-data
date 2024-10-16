@@ -5,7 +5,6 @@ from bs4 import BeautifulSoup
 main_url = "https://www.dhlottery.co.kr/gameResult.do?method=byWin"
 basic_url = "https://www.dhlottery.co.kr/gameResult.do?method=byWin&drwNo="
 
-
 def GetLast():
     resp = requests.get(main_url)
     soup = BeautifulSoup(resp.text, "lxml")
@@ -13,7 +12,6 @@ def GetLast():
     s_idx = result.find(" ")
     e_idx = result.find("회")
     return int(result[s_idx + 1: e_idx])
-
 
 def create_lotto_table():
     cursor.execute('''
@@ -35,7 +33,6 @@ def create_lotto_table():
     ''')
     conn.commit()
 
-
 def insert_into_db(data):
     cursor.execute('''
         INSERT OR IGNORE INTO lotto_results (
@@ -44,7 +41,6 @@ def insert_into_db(data):
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', data)
     conn.commit()
-
 
 def Crawler(s_count, e_count):
     for i in range(s_count, e_count + 1):
@@ -63,7 +59,6 @@ def Crawler(s_count, e_count):
         e_idx = s_idx + 3
         bonus = text[s_idx:e_idx].strip()
 
-        # Parsing the money fields can be simplified using a loop
         money = []
         for j in range(1, 6):
             s_idx = text.find(f"{j}등", e_idx) + 2
@@ -71,12 +66,15 @@ def Crawler(s_count, e_count):
             e_idx = text.find("원", e_idx)
             money.append(int(text[s_idx:e_idx].strip().replace(',', '').split()[2]))
 
-        # construct data tuple and insert into the DB
         data = (i,) + tuple(int(num) for num in numbers) + (int(bonus),) + tuple(money)
         insert_into_db(data)
 
         print(f"Data for draw {i} inserted into the DB.")
 
+def get_last_saved_draw():
+    cursor.execute("SELECT MAX(draw_number) FROM lotto_results")
+    result = cursor.fetchone()[0]
+    return result if result else 0
 
 # Database setup
 conn = sqlite3.connect('lotto.db')
@@ -85,9 +83,18 @@ cursor = conn.cursor()
 # Create table
 create_lotto_table()
 
-# Get the last and start crawling
-last = GetLast()
-Crawler(1, last)
+# Get the last draw number from the website
+last_draw = GetLast()
 
-# Always remember to close the database connection
+# Get the last saved draw number from the database
+last_saved = get_last_saved_draw()
+
+# Start crawling from the next unsaved draw
+if last_saved < last_draw:
+    print(f"Crawling from draw {last_saved + 1} to {last_draw}")
+    Crawler(last_saved + 1, last_draw)
+else:
+    print("Database is up to date. No new data to crawl.")
+
+# Close the database connection
 conn.close()
